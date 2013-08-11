@@ -6,10 +6,7 @@ import SocketServer
 import struct
 import logging
 
-
-PORT = 61090
-PARENT_ADDRESS = '192.168.112.1'
-PARENT_PORT = 61080
+import config
 
 def send_all(sock, data):
     bytes_sent = 0
@@ -65,7 +62,7 @@ class Socks5Server(SocketServer.StreamRequestHandler):
                         reply += socket.inet_aton(local[0]) + struct.pack(">H", local[1])
                     else:
                         logging.info('parent connect to %s:%d', addr, port[0])
-                        remote.connect((PARENT_ADDRESS, PARENT_PORT))
+                        remote.connect((config.PARENT_ADDRESS, config.PARENT_PORT))
                         local = remote.getsockname()
                         reply += socket.inet_aton(local[0]) + struct.pack(">H", local[1])
                         remote.sendall(b"\x05\x01\x00")
@@ -93,7 +90,7 @@ class Socks5Server(SocketServer.StreamRequestHandler):
             logging.error('socket error %s', e)
 def main():
     logging.basicConfig(level=logging.DEBUG)
-    server = ThreadingTCPServer(('', PORT), Socks5Server)
+    server = ThreadingTCPServer(('', config.PORT), Socks5Server)
     server.serve_forever()
 
 import daemon
