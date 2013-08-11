@@ -4,7 +4,6 @@ import socket
 import select
 import SocketServer
 import struct
-import isdirect
 import logging
 
 
@@ -40,6 +39,7 @@ class Socks5Server(SocketServer.StreamRequestHandler):
                 if len(data) <= 0: break
                 if send_all(sock, data) < len(data): break
     def handle(self):
+        import isdirect
         try:
             sock = self.connection
             # 1. Version
@@ -95,6 +95,8 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
     server = ThreadingTCPServer(('', PORT), Socks5Server)
     server.serve_forever()
-if __name__ == '__main__':
+
+import daemon
+with daemon.DaemonContext():
     main()
 
