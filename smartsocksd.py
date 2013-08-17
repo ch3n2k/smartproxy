@@ -67,14 +67,16 @@ class Socks5Server(SocketServer.StreamRequestHandler):
                         reply += socket.inet_aton(local[0]) + struct.pack(">H", local[1])
                         remote.sendall(b"\x05\x01\x00")
                         data = remote.recv(262)
+                        tosend = b"\x05\x01\x00"
                         if addrtype == 1:
-                            remote.sendall(b"\x05\x01\x00\x01")
-                            remote.sendall(socket.inet_aton(addr))
+                            tosend += b"\x01")
+                            tosend += socket.inet_aton(addr)
                         elif addrtype == 3:
-                            remote.sendall(b"\x05\x01\x00\x03")
-                            remote.sendall(chr(len(addr)))
-                            remote.sendall(addr)
-                        remote.sendall(struct.pack('>H', port[0]))
+                            tosend += b"\x03"
+                            tosend += truct.pack('B', len(addr))
+                            tosend += bytes(addr)
+                        tosend += struct.pack('>H', port[0])
+                        remote.sendall(tosend)
                         data = remote.recv(262)
                 else:
                     reply = b"\x05\x07\x00\x01" # Command not supported
