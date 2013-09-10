@@ -29,12 +29,20 @@ class Socks5Server(SocketServer.StreamRequestHandler):
             r, w, e = select.select(fdset, [], [])
             if sock in r:
                 data = sock.recv(4096)
-                if len(data) <= 0: break
-                if send_all(remote, data) < len(data): break
+                if len(data) <= 0:
+		    logging.error("read error from sock")
+		    break
+                elif send_all(remote, data) < len(data):
+		    logging.error("send error to remote")
+		    break
             if remote in r:
                 data = remote.recv(4096)
-                if len(data) <= 0: break
-                if send_all(sock, data) < len(data): break
+                if len(data) <= 0:
+		    logging.error("read error from remote, len = %i" % len(data))
+		    break
+                elif send_all(sock, data) < len(data):
+		    logging.error("send error to sock")
+		    break
     def handle(self):
         import isdirect
         try:
@@ -67,17 +75,15 @@ class Socks5Server(SocketServer.StreamRequestHandler):
                         reply += socket.inet_aton(local[0]) + struct.pack(">H", local[1])
                         remote.sendall(b"\x05\x01\x00")
                         data = remote.recv(262)
-                        tosend = b"\x05\x01\x00"
                         if addrtype == 1:
-                            tosend += b"\x01")
-                            tosend += socket.inet_aton(addr)
+			    tosend = b"\x05\x01\x00\x01" + socket.inet_aton(addr)
                         elif addrtype == 3:
-                            tosend += b"\x03"
-                            tosend += truct.pack('B', len(addr))
-                            tosend += bytes(addr)
-                        tosend += struct.pack('>H', port[0])
+			    tosend = b"\x05\x01\x00\x03"+struct.pack('B', len(addr)) + bytes(addr)
+			tosend += struct.pack('>H', port[0])
+			logging.debug("sending %s" %tosend)
                         remote.sendall(tosend)
                         data = remote.recv(262)
+			logging.debug("data len: %i content %s", len(data), repr(data))
                 else:
                     reply = b"\x05\x07\x00\x01" # Command not supported
             except socket.error:
@@ -90,8 +96,10 @@ class Socks5Server(SocketServer.StreamRequestHandler):
                     self.handle_tcp(sock, remote)
         except socket.error,e:
             logging.error('socket error %s', e)
+	except exception,e:
+	    logging.error('unexpectedd error %s', e)
 def main():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, filename = "/tmp/smartproxy.log")
     server = ThreadingTCPServer(('', config.PORT), Socks5Server)
     server.serve_forever()
 

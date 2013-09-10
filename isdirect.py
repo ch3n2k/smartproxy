@@ -56,7 +56,7 @@ def isdirect(hostname):
             (any([hostname.endswith(i) for i in whitelist_domain]))
 
 #bad IPs returned by domestic DNS servers
-blacklist_ip =[ip2int(ip) for ip in ['60.191.124.236', '180.168.41.175', '93.46.8.89', '203.98.7.65', '8.7.198.45', '78.16.49.15', '46.82.174.68', '243.185.187.39', '243.185.187.30', '159.106.121.75', '37.61.54.158', '159.24.3.173', '0.0.0.0']]
+blacklist_ip =[ip2int(ip) for ip in ['60.191.124.236', '180.168.41.175', '93.46.8.89', '203.98.7.65', '8.7.198.45', '78.16.49.15', '46.82.174.68', '243.185.187.39', '243.185.187.30', '159.106.121.75', '37.61.54.158', '59.24.3.173', '0.0.0.0']]
 #domains hijacked
 blacklist_domain = ['skype.com', 'youtube.com']
 #private IP ranges
