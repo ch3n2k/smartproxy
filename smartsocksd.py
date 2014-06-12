@@ -103,7 +103,6 @@ def main():
     server = ThreadingTCPServer(('', config.PORT), Socks5Server)
     server.serve_forever()
 
-import daemon
-with daemon.DaemonContext():
+if __name__ == '__main__':
     main()
 
