@@ -96,7 +96,7 @@ class Socks5Server(SocketServer.StreamRequestHandler):
                     self.handle_tcp(sock, remote)
         except socket.error,e:
             logging.error('socket error %s', e)
-	except exception,e:
+	except Exception,e:
 	    logging.error('unexpectedd error %s', e)
 def main():
     logging.basicConfig(level=logging.DEBUG, filename = "/tmp/smartproxy.log")
